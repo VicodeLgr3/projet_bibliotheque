@@ -255,7 +255,6 @@ class App:
                                                            f"Isbn : {livres[i][3]}\n\n")
                 else:
                     scrolledtext_livres.insert(tk.END, "Aucun livre trouvé !")
-            entry_mot_cle.delete(0, tk.END)
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")
@@ -277,7 +276,7 @@ class App:
         scrolledtext_livres = tkscroll.ScrolledText(frame, width=40, height=18, font=("Courrier", 12))
         scrolledtext_livres.grid(row=1, column=0, columnspan=3)
 
-        entry_mot_cle.bind("<Return>", lambda event: recherche_isbn_mot_cle_fonction())
+        entry_mot_cle.bind("<KeyRelease>", lambda event: recherche_isbn_mot_cle_fonction())
         fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
         fen.mainloop()
 
@@ -308,7 +307,7 @@ class App:
                 self.db_conn.commit()
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"600x300+{self.fen.winfo_x() + 100}+{self.fen.winfo_y() + 100}")
+        fen.geometry(f"400x300+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
@@ -354,7 +353,48 @@ class App:
         fen.mainloop()
 
     def inserer_livre_graphique(self):
+
+        def inserer_livre_fonction():
+            titre = entry_titre.get()
+            editeur = entry_editeur.get()
+            annee = entry_annee.get()
+            isbn = entry_isbn.get()
+            if len(titre) != 0 and len(editeur) != 0 and len(annee) != 0 and len(isbn) != 0:
+                data_livre = [titre, editeur, annee, isbn]
+                self.db_cursor.execute('INSERT INTO LIVRE VALUES(?,?,?,?)', data_livre)
+                self.db_conn.commit()
+
         fen = tk.Toplevel(self.fen)
+        fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")
+        fen.transient(self.fen)
+        fen.grab_set()
+        fen.focus_set()
+
+        frame = tk.LabelFrame(fen, text="Renseignez les informations sur le livre", font=("Courrier", 12))
+        frame.pack(expand=tk.YES)
+
+        label_titre = tk.Label(frame, text="Titre : ", font=("Courrier", 12))
+        label_titre.grid(row=0, column=0, sticky="ne", pady=5)
+        entry_titre = tk.Entry(frame, font=("Courrier", 11))
+        entry_titre.grid(row=0, column=1)
+
+        label_editeur = tk.Label(frame, text="Editeur : ", font=("Courrier", 12))
+        label_editeur.grid(row=1, column=0, sticky="ne", pady=5)
+        entry_editeur = tk.Entry(frame, font=("Courrier", 11))
+        entry_editeur.grid(row=1, column=1)
+
+        label_annee = tk.Label(frame, text="Année : ", font=("Courrier", 12))
+        label_annee.grid(row=2, column=0, sticky="ne", pady=5)
+        entry_annee = tk.Entry(frame, font=("Courrier", 11))
+        entry_annee.grid(row=2, column=1)
+
+        label_isbn = tk.Label(frame, text="Isbn : ", font=("Courrier", 12))
+        label_isbn.grid(row=3, column=0, sticky="ne", pady=5)
+        entry_isbn = tk.Entry(frame, font=("Courrier", 11))
+        entry_isbn.grid(row=3, column=1)
+
+        button_validate = tk.Button(fen, text="Ajouter", font=("Courrier", 12), command=inserer_livre_fonction)
+        button_validate.pack(pady=10)
 
         fen.mainloop()
 
