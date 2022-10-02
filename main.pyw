@@ -99,7 +99,8 @@ class App:
         frame_mise_a_jour.grid(row=2, column=0, pady=11, padx=15)
 
         changer_date_retour_livre = tk.Button(frame_mise_a_jour, text="Changer la date de retour d'un livre", width=40,
-                                              height=2, font=("Courrier", 11))
+                                              height=2, font=("Courrier", 11),
+                                              command=self.mettre_a_jour_date_retour_livre_graphique)
         changer_date_retour_livre.pack(pady=2)
         changer_donnee_usager = tk.Button(frame_mise_a_jour, text="Changer une donnée d'un usager", width=40, height=2,
                                           font=("Courrier", 11))
@@ -453,6 +454,21 @@ class App:
 
         fen.bind("<Return>", lambda event: inserer_emprunt_fonction())
         fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
+        fen.mainloop()
+
+    def mettre_a_jour_date_retour_livre_graphique(self):
+
+        def mettre_a_jour_date_retour_livre_fonction():
+            pass
+
+        fen = tk.Toplevel(self.fen)
+        fen.geometry(f"600x400+{self.fen.winfo_x() + 100}+{self.fen.winfo_y() + 50}")
+        fen.transient(self.fen)
+        fen.grab_set()
+        fen.focus_set()
+
+
+
         fen.mainloop()
 
 
