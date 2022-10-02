@@ -468,7 +468,6 @@ class App:
         fen.focus_set()
 
 
-
         fen.mainloop()
 
 
