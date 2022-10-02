@@ -1,5 +1,6 @@
 import tkinter as tk
 import tkinter.scrolledtext as tkscroll
+from tkinter import messagebox
 import datetime
 import sqlite3
 import random
@@ -88,7 +89,8 @@ class App:
         inserer_livre = tk.Button(frame_inserer, text="Insérer un livre", width=40, height=2, font=("Courrier", 11),
                                   command=self.inserer_livre_graphique)
         inserer_livre.pack(pady=2)
-        inserer_emprunt = tk.Button(frame_inserer, text="Insérer un emprunt", width=40, height=2, font=("Courrier", 11))
+        inserer_emprunt = tk.Button(frame_inserer, text="Insérer un emprunt", width=40, height=2, font=("Courrier", 11),
+                                    command=self.inserer_emprunt_graphique)
         inserer_emprunt.pack(pady=2)
 
         # Frame qui va gérer la section mise à jour de la base
@@ -396,6 +398,61 @@ class App:
         button_validate = tk.Button(fen, text="Ajouter", font=("Courrier", 12), command=inserer_livre_fonction)
         button_validate.pack(pady=10)
 
+        fen.bind("<Return>", lambda event: inserer_livre_fonction())
+        fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
+        fen.mainloop()
+
+    def inserer_emprunt_graphique(self):
+        def inserer_emprunt_fonction():
+            code_barre = entry_code_barre.get()
+            isbn = entry_isbn.get()
+            retour = entry_retour.get()
+            if len(code_barre) != 0 and len(isbn) != 0 and len(retour) != 0:
+                self.db_cursor.execute('SELECT * FROM USAGER WHERE code_barre = ?', [code_barre, ])
+                if len(self.db_cursor.fetchall()) != 0:
+                    self.db_cursor.execute('SELECT * FROM LIVRE WHERE isbn = ?', [isbn, ])
+                    if len(self.db_cursor.fetchall()) != 0:
+                        try:
+                            self.db_cursor.execute('INSERT INTO EMPRUNT VALUES(?,?,?)', [code_barre, isbn, retour])
+                        except sqlite3.IntegrityError:
+                            messagebox.showerror("Emprunt existant", f"{code_barre} emprunte déjà le livre", parent=fen)
+                        else:
+                            messagebox.showinfo("Livre insérer", "Le livre a été insérer", parent=fen)
+                        self.db_conn.commit()
+                    else:
+                        messagebox.showerror("Isbn invalide", "L'isbn ne correspond à aucun livre", parent=fen)
+                else:
+                    messagebox.showerror("Code barre invalide", "Le code barre ne correspond à personne", parent=fen)
+
+        fen = tk.Toplevel(self.fen)
+        fen.geometry(f"400x200+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 150}")
+        fen.transient(self.fen)
+        fen.grab_set()
+        fen.focus_set()
+
+        frame = tk.LabelFrame(fen, text="Renseignez les informations sur l'emprunt", font=("Courrier", 12))
+        frame.pack(expand=tk.YES)
+
+        label_code_barre = tk.Label(frame, text="Code barre : ", font=("Courrier", 12))
+        label_code_barre.grid(row=0, column=0, sticky="ne", pady=5)
+        entry_code_barre = tk.Entry(frame, font=("Courrier", 11))
+        entry_code_barre.grid(row=0, column=1)
+
+        label_isbn = tk.Label(frame, text="Isbn : ", font=("Courrier", 12))
+        label_isbn.grid(row=1, column=0, sticky="ne", pady=5)
+        entry_isbn = tk.Entry(frame, font=("Courrier", 11))
+        entry_isbn.grid(row=1, column=1)
+
+        label_retour = tk.Label(frame, text="Date de retour : ", font=("Courrier", 12))
+        label_retour.grid(row=2, column=0, sticky="ne", pady=5)
+        entry_retour = tk.Entry(frame, font=("Courrier", 11))
+        entry_retour.grid(row=2, column=1)
+
+        button_validate = tk.Button(fen, text="Ajouter", font=("Courrier", 12), command=inserer_emprunt_fonction)
+        button_validate.pack(pady=10)
+
+        fen.bind("<Return>", lambda event: inserer_emprunt_fonction())
+        fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
         fen.mainloop()
 
 
