@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import ttk
 import tkinter.scrolledtext as tkscroll
 from tkinter import messagebox
 import datetime
@@ -458,6 +459,24 @@ class App:
 
     def mettre_a_jour_date_retour_livre_graphique(self):
 
+        def affiche_isbn_avec_code_barre():
+            combobox_isbn.set("")
+            code_barre = combobox_code_barre.get()
+            if len(code_barre) != 0:
+                self.db_cursor.execute('SELECT isbn FROM EMPRUNT WHERE code_barre = ?', [code_barre, ])
+                combobox_isbn["values"] = [x for x in self.db_cursor.fetchall()]
+            else:
+                messagebox.showinfo("Code barre manquant", "Veuillez renseignez un code barre pour continuer",
+                                    parent=fen)
+
+        def affiche_date_avec_isbn():
+            isbn = combobox_isbn.get()
+            if len(isbn) != 0:
+                self.db_cursor.execute('SELECT retour FROM EMPRUNT WHERE isbn = ?')
+            else:
+                messagebox.showinfo("Informations manquantes", "Veuillez renseignez les toutes les informations",
+                                    parent=fen)
+
         def mettre_a_jour_date_retour_livre_fonction():
             pass
 
@@ -467,7 +486,34 @@ class App:
         fen.grab_set()
         fen.focus_set()
 
+        frame_rechercher_emprunt = tk.LabelFrame(fen, text="Rechercher l'emprunt", font=("Courrier", 12))
+        frame_rechercher_emprunt.pack(expand=tk.YES)
 
+        frame_changer_emprunt = tk.LabelFrame(fen, text="Changer la date de l'emprunt", font=("Courrier", 12))
+        frame_changer_emprunt.pack(expand=tk.YES)
+
+        label_code_barre = tk.Label(frame_rechercher_emprunt, text="Code barre : ", font=("Courrier", 12))
+        label_code_barre.grid(row=0, column=0, sticky="ne", pady=5)
+
+        self.db_cursor.execute('SELECT DISTINCT code_barre FROM EMPRUNT')
+        combobox_code_barre = ttk.Combobox(frame_rechercher_emprunt, values=[x for x in self.db_cursor.fetchall()],
+                                           font=("Courrier", 12), state="readonly")
+        combobox_code_barre.grid(row=0, column=1)
+
+        label_isbn = tk.Label(frame_rechercher_emprunt, text="Isbn : ", font=("Courrier", 12))
+        label_isbn.grid(row=1, column=0, sticky="ne", pady=5)
+
+        combobox_isbn = ttk.Combobox(frame_rechercher_emprunt, font=("Courrier", 12), state="readonly")
+        combobox_isbn.grid(row=1, column=1)
+
+        label_date = tk.Label(frame_changer_emprunt, text="Date actuelle : ", font=("Courrier", 12))
+        label_date.grid(row=0, column=0, sticky="ne", pady=5)
+
+        label_date_actuelle = tk.Label(frame_changer_emprunt, font=("Courrier", 12))
+        label_date_actuelle.grid(row=0, column=1)
+
+        combobox_code_barre.bind("<Return>", lambda event: affiche_isbn_avec_code_barre())
+        combobox_isbn.bind("<Return>", lambda event: affiche_date_avec_isbn())
         fen.mainloop()
 
 
