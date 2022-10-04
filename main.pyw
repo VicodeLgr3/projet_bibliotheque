@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 import tkinter.scrolledtext as tkscroll
 from tkinter import messagebox
+import tkcalendar as tkcal
 import datetime
 import sqlite3
 import random
@@ -104,7 +105,7 @@ class App:
                                               command=self.mettre_a_jour_date_retour_livre_graphique)
         changer_date_retour_livre.pack(pady=2)
         changer_donnee_usager = tk.Button(frame_mise_a_jour, text="Changer une donnée d'un usager", width=40, height=2,
-                                          font=("Courrier", 11))
+                                          font=("Courrier", 11), command=self.mettre_a_jour_donnee_usager)
         changer_donnee_usager.pack(pady=2)
 
         # Frame qui va gérer la section supprimer dans la base
@@ -234,6 +235,7 @@ class App:
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"500x300+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 100}")
+        fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
@@ -262,6 +264,7 @@ class App:
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")
+        fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
@@ -312,6 +315,7 @@ class App:
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"400x300+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")
+        fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
@@ -370,6 +374,7 @@ class App:
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")
+        fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
@@ -428,6 +433,7 @@ class App:
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"400x200+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 150}")
+        fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
@@ -464,27 +470,44 @@ class App:
             code_barre = combobox_code_barre.get()
             if len(code_barre) != 0:
                 self.db_cursor.execute('SELECT isbn FROM EMPRUNT WHERE code_barre = ?', [code_barre, ])
-                combobox_isbn["values"] = [x for x in self.db_cursor.fetchall()]
-            else:
-                messagebox.showinfo("Code barre manquant", "Veuillez renseignez un code barre pour continuer",
-                                    parent=fen)
+                isbn = [x for x in self.db_cursor.fetchall()]
+                combobox_isbn["values"] = isbn
+                combobox_isbn.set(isbn[0])
 
         def affiche_date_avec_isbn():
             isbn = combobox_isbn.get()
             if len(isbn) != 0:
-                self.db_cursor.execute('SELECT retour FROM EMPRUNT WHERE isbn = ?')
+                self.db_cursor.execute('SELECT retour FROM EMPRUNT WHERE isbn = ?', [isbn, ])
+                date_actuelle = self.db_cursor.fetchall()
+                label_date_actuelle["text"] = date_actuelle[0]
+                label_isbn_view["text"] = isbn
             else:
-                messagebox.showinfo("Informations manquantes", "Veuillez renseignez les toutes les informations",
+                messagebox.showinfo("Informations manquantes", "Veuillez renseignez toutes les informations",
                                     parent=fen)
 
         def mettre_a_jour_date_retour_livre_fonction():
-            pass
+            isbn = label_isbn_view["text"]
+            nouvelle_date = dateentry_date_nouvelle.get()
+            if len(isbn) != 0:
+                self.db_cursor.execute('UPDATE EMPRUNT SET retour = ? WHERE isbn = ?', [nouvelle_date, isbn])
+                self.db_conn.commit()
+                combobox_code_barre.set("")
+                combobox_isbn.set("")
+                combobox_isbn["values"] = []
+                label_isbn_view["text"] = ""
+                label_date_actuelle["text"] = ""
+            else:
+                messagebox.showinfo("Informations manquantes", "Renseignez les informations manquantes pour continuer")
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"600x400+{self.fen.winfo_x() + 100}+{self.fen.winfo_y() + 50}")
+        fen.geometry(f"450x250+{self.fen.winfo_x() + 180}+{self.fen.winfo_y() + 120}")
+        fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
+
+        label_info = tk.Label(fen, text="Appuyer sur la touche 'Entrée' pour valider vos choix", font=("Courrier", 10))
+        label_info.pack()
 
         frame_rechercher_emprunt = tk.LabelFrame(fen, text="Rechercher l'emprunt", font=("Courrier", 12))
         frame_rechercher_emprunt.pack(expand=tk.YES)
@@ -506,14 +529,40 @@ class App:
         combobox_isbn = ttk.Combobox(frame_rechercher_emprunt, font=("Courrier", 12), state="readonly")
         combobox_isbn.grid(row=1, column=1)
 
-        label_date = tk.Label(frame_changer_emprunt, text="Date actuelle : ", font=("Courrier", 12))
-        label_date.grid(row=0, column=0, sticky="ne", pady=5)
+        label_isbn = tk.Label(frame_changer_emprunt, text="Isbn : ", font=("Courrier", 12))
+        label_isbn.grid(row=0, column=0, sticky="ne", pady=5)
+
+        label_isbn_view = tk.Label(frame_changer_emprunt, font=("Courrier", 12))
+        label_isbn_view.grid(row=0, column=1)
+
+        label_date_actuelle_ = tk.Label(frame_changer_emprunt, text="Date actuelle : ", font=("Courrier", 12))
+        label_date_actuelle_.grid(row=1, column=0, sticky="ne", pady=5)
 
         label_date_actuelle = tk.Label(frame_changer_emprunt, font=("Courrier", 12))
-        label_date_actuelle.grid(row=0, column=1)
+        label_date_actuelle.grid(row=1, column=1)
+
+        label_date_nouvelle = tk.Label(frame_changer_emprunt, text="Nouvelle date : ", font=("Courrier", 12))
+        label_date_nouvelle.grid(row=2, column=0, sticky="ne", pady=5)
+
+        dateentry_date_nouvelle = tkcal.DateEntry(frame_changer_emprunt, date_pattern="yyyy-mm-dd")
+        dateentry_date_nouvelle.grid(row=2, column=1)
+
+        button_validate = tk.Button(frame_changer_emprunt, text="Changer", font=("Courrier", 12),
+                                    command=mettre_a_jour_date_retour_livre_fonction)
+        button_validate.grid(row=2, column=2)
 
         combobox_code_barre.bind("<Return>", lambda event: affiche_isbn_avec_code_barre())
         combobox_isbn.bind("<Return>", lambda event: affiche_date_avec_isbn())
+        fen.mainloop()
+
+    def mettre_a_jour_donnee_usager(self):
+        fen = tk.Toplevel(self.fen)
+        fen.geometry(f"600x400+{self.fen.winfo_x() + 100}+{self.fen.winfo_y() + 50}")
+        fen.resizable(False, False)
+        fen.transient(self.fen)
+        fen.grab_set()
+        fen.focus_set()
+
         fen.mainloop()
 
 
