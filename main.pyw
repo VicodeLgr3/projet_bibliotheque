@@ -3,6 +3,7 @@ from tkinter import ttk
 import tkinter.scrolledtext as tkscroll
 from tkinter import messagebox
 import tkcalendar as tkcal  # pip install tkcalendar
+import pyqrcode  # pip install pyqrcode
 import datetime
 import sqlite3
 import random
@@ -297,11 +298,26 @@ class App:
             return code_barre
 
         def inserer_usager_fonction():
-            nom = entry_nom.get()
-            prenom = entry_prenom.get()
+
+            def affiche_code_barre_qrcode():
+                fen_qrcode = tk.Toplevel(fen)
+                fen_qrcode.geometry(f"300x260+{fen.winfo_x() + 50}+{fen.winfo_y() + 20}")
+                fen_qrcode.transient(fen)
+                fen_qrcode.grab_set()
+                fen_qrcode.focus_set()
+
+                img = tk.BitmapImage(data=pyqrcode.create(code_barre).xbm(scale=8))
+                tk.Label(fen_qrcode, image=img).pack(expand=tk.YES)
+
+                tk.Label(fen_qrcode, text=f"Le code barre est {code_barre}", font=("Courrier", 12)).pack(pady=5)
+
+                fen_qrcode.mainloop()
+
+            nom = entry_nom.get().upper()
+            prenom = entry_prenom.get().upper()
             adresse = entry_adresse.get()
             cp = entry_cp.get()
-            ville = entry_ville.get()
+            ville = entry_ville.get().title()
             email = entry_ville.get()
             code_barre = genere_code_barre()
             if len(nom) != 0 and len(prenom) != 0 and len(adresse) != 0 and len(cp) != 0 and len(ville) != 0 \
@@ -309,6 +325,13 @@ class App:
                 data_usager = [nom, prenom, adresse, cp, ville, email, code_barre]
                 self.db_cursor.execute('INSERT INTO USAGER VALUES (?,?,?,?,?,?,?)', data_usager)
                 self.db_conn.commit()
+                entry_nom.delete(0, tk.END)
+                entry_prenom.delete(0, tk.END)
+                entry_adresse.delete(0, tk.END)
+                entry_cp.delete(0, tk.END)
+                entry_ville.delete(0, tk.END)
+                entry_email.delete(0, tk.END)
+                affiche_code_barre_qrcode()
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"400x300+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")
@@ -368,6 +391,10 @@ class App:
                 data_livre = [titre, editeur, annee, isbn]
                 self.db_cursor.execute('INSERT INTO LIVRE VALUES(?,?,?,?)', data_livre)
                 self.db_conn.commit()
+                entry_titre.delete(0, tk.END)
+                entry_editeur.delete(0, tk.END)
+                entry_annee.delete(0, tk.END)
+                entry_isbn.delete(0, tk.END)
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")
