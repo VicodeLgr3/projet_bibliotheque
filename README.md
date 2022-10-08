@@ -5,9 +5,9 @@ L'interface est divisée en 4 sections
 
   1. La première section permet de rechercher dans la base de données, qui est divisée en 4 boutons
     1. Un bouton qui permet de rechercher les livres empruntés par une personne
-    2. Un bouton qui permet de rechercher un livre emprunté avec l'ISBN
-    3. Un bouton qui permet d'afficher les personnes en retard sur leur emprunt
-    4. Un bouton qui permet de rechercher un livre par mot-clé
+    3. Un bouton qui permet de rechercher un livre emprunté avec l'ISBN
+    4. Un bouton qui permet d'afficher les personnes en retard sur leur emprunt
+    5. Un bouton qui permet de rechercher un livre par mot-clé
     
   2. La deuxième section permet d'insérer dans la base de données, qui est divisée en 3 boutons
     1. Un bouton qui permet d'insérer un usager
