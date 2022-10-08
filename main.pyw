@@ -419,10 +419,11 @@ class App:
                         try:
                             self.db_cursor.execute('INSERT INTO EMPRUNT VALUES(?,?,?)', [code_barre, isbn, retour])
                         except sqlite3.IntegrityError:
+                            self.db_conn.commit()
                             messagebox.showerror("Emprunt existant", f"{code_barre} emprunte déjà le livre", parent=fen)
                         else:
+                            self.db_conn.commit()
                             messagebox.showinfo("Livre insérer", "Le livre a été insérer", parent=fen)
-                        self.db_conn.commit()
                     else:
                         messagebox.showerror("Isbn invalide", "L'isbn ne correspond à aucun livre", parent=fen)
                 else:
@@ -908,8 +909,34 @@ class App:
         fen.mainloop()
 
     def supprimer_livre_graphique(self):
+
+        def affiche_livre_avec_isbn():
+            isbn = combobox_isbn.get()
+            if len(isbn) != 0:
+                self.db_cursor.execute('SELECT * FROM LIVRE WHERE isbn = ?', [isbn, ])
+                data_livre = self.db_cursor.fetchall()[0]
+                label_titre_result["text"] = data_livre[0]
+                label_editeur_result["text"] = data_livre[1]
+                label_annee_result["text"] = data_livre[2]
+                label_isbn_result["text"] = data_livre[3]
+
+        def supprimer_livre_fonction():
+            if len(label_isbn_result["text"]) != 0:
+                validation = messagebox.askquestion(f"Confirmation", f"Voulez-vous vraiment supprimer "
+                                                                     f"le livre {label_isbn_result['text']} ?",
+                                                    parent=fen)
+                if validation == "yes":
+                    self.db_cursor.execute('DELETE FROM LIVRE WHERE isbn = ?', [label_isbn_result["text"], ])
+                    self.db_conn.commit()
+                    combobox_isbn.set("")
+                    label_titre_result["text"] = ""
+                    label_editeur_result["text"] = ""
+                    label_annee_result["text"] = ""
+                    label_isbn_result["text"] = ""
+
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"600x400+{self.fen.winfo_x() + 100}+{self.fen.winfo_y() + 50}")
+        fen.geometry(f"500x280+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 110}")
+        fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
         fen.focus_set()
@@ -925,7 +952,7 @@ class App:
 
         self.db_cursor.execute('SELECT LIVRE.isbn FROM LIVRE EXCEPT SELECT EMPRUNT.isbn FROM EMPRUNT')
         combobox_isbn = ttk.Combobox(frame_rechercher_livre, values=[x[0] for x in self.db_cursor.fetchall()],
-                                     font=("Courrier", 12))
+                                     font=("Courrier", 11), state="readonly")
         combobox_isbn.grid(row=0, column=1, sticky="w")
 
         label_titre = tk.Label(frame_supprimer_livre, text="Titre : ", font=("Courrier", 12))
@@ -934,11 +961,11 @@ class App:
         label_titre_result = tk.Label(frame_supprimer_livre, font=("Courrier", 12))
         label_titre_result.grid(row=0, column=1, sticky="w")
 
-        label_edtieur = tk.Label(frame_supprimer_livre, text="Editeur : ", font=("Courrier", 12))
-        label_edtieur.grid(row=1, column=0, sticky="ne", pady=5)
+        label_editeur = tk.Label(frame_supprimer_livre, text="Editeur : ", font=("Courrier", 12))
+        label_editeur.grid(row=1, column=0, sticky="ne", pady=5)
 
-        label_edtieur_result = tk.Label(frame_supprimer_livre, font=("Courrier", 12))
-        label_edtieur_result.grid(row=1, column=1, sticky="w")
+        label_editeur_result = tk.Label(frame_supprimer_livre, font=("Courrier", 12))
+        label_editeur_result.grid(row=1, column=1, sticky="w")
 
         label_annee = tk.Label(frame_supprimer_livre, text="Année : ", font=("Courrier", 12))
         label_annee.grid(row=2, column=0, sticky="ne", pady=5)
@@ -946,10 +973,88 @@ class App:
         label_annee_result = tk.Label(frame_supprimer_livre, font=("Courrier", 12))
         label_annee_result.grid(row=2, column=1, sticky="w")
 
+        label_isbn = tk.Label(frame_supprimer_livre, text="Isbn : ", font=("Courrier", 12))
+        label_isbn.grid(row=3, column=0, sticky="ne", pady=5)
+
+        label_isbn_result = tk.Label(frame_supprimer_livre, font=("Courrier", 12))
+        label_isbn_result.grid(row=3, column=1, sticky="w")
+
+        button_validate = tk.Button(fen, text="Valider la suppression", font=("Courrier", 12),
+                                    command=supprimer_livre_fonction)
+        button_validate.pack(pady=5)
+
+        combobox_isbn.bind("<Return>", lambda event: affiche_livre_avec_isbn())
         fen.mainloop()
 
     def supprimer_emprunt_graphique(self):
-        pass
+
+        def affiche_emprunt_avec_isbn():
+            isbn = combobox_isbn.get()
+            if len(isbn) != 0:
+                self.db_cursor.execute('SELECT * FROM EMPRUNT WHERE isbn = ?', [isbn, ])
+                data_emprunt = self.db_cursor.fetchall()[0]
+                label_code_barre_result["text"] = data_emprunt[0]
+                label_isbn_result["text"] = data_emprunt[1]
+                label_retour_result["text"] = data_emprunt[2]
+
+        def supprimer_emprunt_fonction():
+            if len(label_isbn_result["text"]) != 0:
+                validation = messagebox.askquestion("Confirmation", f"Voulez-vous supprimer "
+                                                                    f"l'emprunt {label_isbn_result['text']} ?",
+                                                    parent=fen)
+                if validation == "yes":
+                    self.db_cursor.execute('DELETE FROM EMPRUNT WHERE isbn = ?', [label_isbn_result["text"], ])
+                    self.db_conn.commit()
+                    combobox_isbn.set("")
+                    label_code_barre_result["text"] = ""
+                    label_isbn_result["text"] = ""
+                    label_retour_result["text"] = ""
+
+        fen = tk.Toplevel(self.fen)
+        fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")
+        fen.resizable(False, False)
+        fen.transient(self.fen)
+        fen.grab_set()
+        fen.focus_set()
+
+        frame_rechercher_emprunt = tk.LabelFrame(fen, text="Rechercher l'emprunt", font=("Courrier", 12))
+        frame_rechercher_emprunt.pack(expand=tk.YES)
+
+        frame_supprimer_emprunt = tk.LabelFrame(fen, text="Supprimer l'emprunt", font=("Courrier", 12))
+        frame_supprimer_emprunt.pack(expand=tk.YES)
+
+        label_isbn = tk.Label(frame_rechercher_emprunt, text="Isbn : ", font=("Courrier", 12))
+        label_isbn.grid(row=0, column=0, sticky="ne", pady=5)
+
+        self.db_cursor.execute('SELECT isbn FROM EMPRUNT')
+        combobox_isbn = ttk.Combobox(frame_rechercher_emprunt, values=[x[0] for x in self.db_cursor.fetchall()],
+                                     font=("Courrier", 11), state="readonly")
+        combobox_isbn.grid(row=0, column=1, sticky="w")
+
+        label_code_barre = tk.Label(frame_supprimer_emprunt, text="Code barre : ", font=("Courrier", 12))
+        label_code_barre.grid(row=0, column=0, sticky="ne", pady=5)
+
+        label_code_barre_result = tk.Label(frame_supprimer_emprunt, font=("Courrier", 12))
+        label_code_barre_result.grid(row=0, column=1, sticky="w")
+
+        label_isbn = tk.Label(frame_supprimer_emprunt, text="Isbn : ", font=("Courrier", 12))
+        label_isbn.grid(row=1, column=0, sticky="ne", pady=5)
+
+        label_isbn_result = tk.Label(frame_supprimer_emprunt, font=("Courrier", 12))
+        label_isbn_result.grid(row=1, column=1, sticky="w")
+
+        label_retour = tk.Label(frame_supprimer_emprunt, text="Date de retour : ", font=("Courrier", 12))
+        label_retour.grid(row=2, column=0, sticky="ne", pady=5)
+
+        label_retour_result = tk.Label(frame_supprimer_emprunt, font=("Courrier", 12))
+        label_retour_result.grid(row=2, column=1, sticky="w")
+
+        button_validate = tk.Button(fen, text="Valider la suppression", font=("Courrier", 12),
+                                    command=supprimer_emprunt_fonction)
+        button_validate.pack(pady=5)
+
+        combobox_isbn.bind("<Return>", lambda event: affiche_emprunt_avec_isbn())
+        fen.mainloop()
 
 
 if __name__ == '__main__':
