@@ -1,6 +1,11 @@
 # projet_bibliotheque
 Un gestionnaire de bibliothèque avec une interface graphique (tkinter) en python
 
+## Prérequis
+- Installation du module tkcalendar avec <code>pip install tkcalendar</code>
+
+<hr>
+
 L'interface est divisée en 4 sections
 
 ### - La première section permet de rechercher dans la base de données, qui est divisée en 4 boutons
