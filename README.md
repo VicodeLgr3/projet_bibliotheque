@@ -3,6 +3,7 @@ Un gestionnaire de bibliothèque avec une interface graphique (tkinter) en pytho
 
 ## Prérequis
 - Installation du module tkcalendar avec <code>pip install tkcalendar</code>
+- Installation du module pyqrcode avec <code>pip install pyqrcode</code>
 
 <hr>
 
