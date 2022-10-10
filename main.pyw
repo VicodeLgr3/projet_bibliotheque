@@ -231,11 +231,12 @@ class App:
                                                               f"Code barre : {personnes[i][6]}\n")
                     for r in range(0, len(retards)):
                         if personnes[i][6] == retards[r][0]:
-                            scrolledtext_retardataires.insert(tk.END, f"Isbn : {retards[r][1]}\n")
+                            scrolledtext_retardataires.insert(tk.END, f"Isbn : {retards[r][1]}\n"
+                                                                      f"Date de retour : {retards[r][2]}\n")
                     scrolledtext_retardataires.insert(tk.END, "\n")
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"500x300+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 100}")
+        fen.geometry(f"350x450+{self.fen.winfo_x() + 250}+{self.fen.winfo_y() + 30}")
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
