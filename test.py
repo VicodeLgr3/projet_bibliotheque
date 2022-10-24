@@ -5,7 +5,7 @@ import tkinter as tk
 
 fen = tk.Tk()
 
-fen.minsize(844, 490)
+#fen.minsize(844, 490)
 
 # Titre principal
 titre_principale = tk.Label(fen, text="Gestionnaire d'une bibliothèque", font=("Courrier", 30))
@@ -104,5 +104,8 @@ supprimer_emprunt.grid(row=1, column=0, sticky="nwse")
 frame_supprimer.rowconfigure(1, weight=1)
 frame_supprimer.columnconfigure(0, weight=1)
 
+fen.update()
+
+print(fen.winfo_width(), fen.winfo_height())
 
 fen.mainloop()
