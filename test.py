@@ -4,7 +4,6 @@
 import tkinter as tk
 import platform
 
-print(platform.system())
 
 def center_window(win, width: int = 600, height: int = 400):
     x_coordinate = int((win.winfo_screenwidth() / 2) - (width / 2))
@@ -38,8 +37,10 @@ def test():
     height = 300
     x_coordinate = int((fen_width / 2) - (width / 2) + fen.winfo_x())
     y_coordinate = int((fen_height / 2) - (height / 2) + fen.winfo_y() - 20)
-    win.geometry(f"{width}x{height}+{fen.winfo_x() + fen_width}+{fen.winfo_y() - 35}")
-
+    if platform.system() == "Linux":
+        win.geometry(f"{width}x{height}+{fen.winfo_x() + fen_width}+{fen.winfo_y() - 35}")
+    elif platform.system() == "Windows":
+        win.geometry(f"{width}x{height}+{fen.winfo_x() + fen_width}+{fen.winfo_y()}")
     win.mainloop()
 
 
