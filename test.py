@@ -42,13 +42,6 @@ frame_rechercher.rowconfigure(3, weight=1)
 frame_rechercher.columnconfigure(0, weight=1)
 
 
-def test():
-    print(fen.winfo_width(), fen.winfo_height())
-
-
-rechercher_livres_empruntes.bind("<Visibility>", lambda event: test())
-
-
 # Frame qui va gérer la section insertion dans la base
 frame_inserer = tk.LabelFrame(fen, text="Insérer dans la base", font=("Courrier", 22))
 frame_inserer.grid(row=1, column=1, pady=15, padx=15, sticky="nwse")
