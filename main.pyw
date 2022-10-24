@@ -48,7 +48,7 @@ class App:
         self.db_cursor = self.db_conn.cursor()
 
         self.fen = tk.Tk()
-        self.fen.geometry(center_window(self.fen, 805, 500))
+        self.fen.geometry(center_window(self.fen, 844, 490))
         self.fen.resizable(False, False)
         self.fen.title(f'Bibliothèques - {date()}')
         try:

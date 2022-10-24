@@ -2,7 +2,9 @@
 
 
 import tkinter as tk
+import platform
 
+print(platform.system())
 
 def center_window(win, width: int = 600, height: int = 400):
     x_coordinate = int((win.winfo_screenwidth() / 2) - (width / 2))
@@ -12,7 +14,8 @@ def center_window(win, width: int = 600, height: int = 400):
 
 fen = tk.Tk()
 
-fen.geometry(center_window(fen, 844, 490))
+fen_width, fen_height = 844, 490
+fen.geometry(center_window(fen, fen_width, fen_height))
 fen.minsize(844, 490)
 
 # Titre principal
@@ -28,11 +31,24 @@ frame_rechercher.grid(row=1, column=0, pady=15, padx=15, sticky="nwse")
 fen.rowconfigure(1, weight=1)
 fen.columnconfigure(0, weight=1)
 
+
+def test():
+    win = tk.Toplevel()
+    width = 400
+    height = 300
+    x_coordinate = int((fen_width / 2) - (width / 2) + fen.winfo_x())
+    y_coordinate = int((fen_height / 2) - (height / 2) + fen.winfo_y() - 20)
+    win.geometry(f"{width}x{height}+{fen.winfo_x() + fen_width}+{fen.winfo_y() - 35}")
+
+    win.mainloop()
+
+
 rechercher_livres_empruntes = tk.Button(frame_rechercher, text="Rechercher les livres empruntés par une personne ",
-                                        width=40, height=2, font=("Courrier", 11))
+                                        width=40, height=2, font=("Courrier", 11), command=test)
 rechercher_livres_empruntes.grid(row=0, column=0, sticky="nwse")
 frame_rechercher.rowconfigure(0, weight=1)
 frame_rechercher.columnconfigure(0, weight=1)
+
 rechercher_livre_emprunte_isbn = tk.Button(frame_rechercher, text="Rechercher un livre emprunté par ISBN",
                                                    width=40, height=2, font=("Courrier", 11))
 rechercher_livre_emprunte_isbn.grid(row=1, column=0, sticky="nwse")
