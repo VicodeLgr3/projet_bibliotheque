@@ -11,8 +11,7 @@ def center_window(win, width: int = 600, height: int = 400):
 
 
 fen = tk.Tk()
-
-#fen.minsize(844, 490)
+fen.overrideredirect()
 
 # Titre principal
 titre_principale = tk.Label(fen, text="Gestionnaire d'une bibliothèque", font=("Courrier", 30))
@@ -105,6 +104,8 @@ frame_supprimer.rowconfigure(1, weight=1)
 frame_supprimer.columnconfigure(0, weight=1)
 
 fen.update()
+
+fen.minsize(fen.winfo_width(), fen.winfo_height())
 
 fen.geometry(center_window(fen, fen.winfo_width(), fen.winfo_height()))
 
