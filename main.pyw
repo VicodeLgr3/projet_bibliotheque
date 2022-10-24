@@ -52,7 +52,7 @@ class App:
         self.fen.resizable(False, False)
         self.fen.title(f'Bibliothèques - {date()}')
         try:
-            self.fen.iconbitmap('@icone_windows.ico')
+            self.fen.iconbitmap('icone_windows.ico')
         except tk.TclError:
             pass
         self.couleur = "#2E64FE"
