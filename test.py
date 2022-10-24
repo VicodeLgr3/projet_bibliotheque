@@ -13,6 +13,7 @@ def center_window(win, width: int = 600, height: int = 400):
 fen = tk.Tk()
 
 fen.geometry(center_window(fen, 844, 490))
+fen.minsize(844, 490)
 
 # Titre principal
 titre_principale = tk.Label(fen, text="Gestionnaire d'une bibliothèque", font=("Courrier", 30))
