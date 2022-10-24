@@ -51,7 +51,10 @@ class App:
         self.fen.geometry(center_window(self.fen, 805, 500))
         self.fen.resizable(False, False)
         self.fen.title(f'Bibliothèques - {date()}')
-        self.fen.iconbitmap('icone.ico')
+        try:
+            self.fen.iconbitmap('@icone_windows.ico')
+        except tk.TclError:
+            pass
         self.couleur = "#2E64FE"
         self.fen.config(bg=self.couleur)
 
