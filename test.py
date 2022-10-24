@@ -3,6 +3,13 @@
 
 import tkinter as tk
 
+
+def center_window(win, width: int = 600, height: int = 400):
+    x_coordinate = int((win.winfo_screenwidth() / 2) - (width / 2))
+    y_coordinate = int((win.winfo_screenheight() / 2) - (height / 2) - 30)
+    return f"{width}x{height}+{x_coordinate}+{y_coordinate}"
+
+
 fen = tk.Tk()
 
 #fen.minsize(844, 490)
@@ -99,6 +106,6 @@ frame_supprimer.columnconfigure(0, weight=1)
 
 fen.update()
 
-print(fen.winfo_width(), fen.winfo_height())
+fen.geometry(center_window(fen, fen.winfo_width(), fen.winfo_height()))
 
 fen.mainloop()
