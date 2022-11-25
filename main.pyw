@@ -49,7 +49,7 @@ class App:
 
         self.fen = tk.Tk()
         self.fen.geometry(center_window(self.fen, 844, 490))
-        self.fen.resizable(False, False)
+        self.fen.minsize(844, 490)
         self.fen.title(f'Bibliothèques - {date()}')
         try:
             self.fen.iconbitmap('icone_windows.ico')
@@ -58,72 +58,102 @@ class App:
         self.couleur = "#2E64FE"
         self.fen.config(bg=self.couleur)
 
+        self.fen.rowconfigure(0, weight=1)
+        self.fen.rowconfigure(1, weight=1)
+        self.fen.rowconfigure(2, weight=1)
+        self.fen.columnconfigure(0, weight=1)
+        self.fen.columnconfigure(1, weight=1)
+
         # Titre principal
         titre_principale = tk.Label(self.fen, text="Gestionnaire d'une bibliothèque", bg=self.couleur,
                                     font=("Courrier", 30))
-        titre_principale.grid(row=0, column=0, columnspan=2)
+        titre_principale.grid(row=0, column=0, columnspan=2, sticky="nwse")
 
         # Frame qui va gérer la section rechercher dans la base
         frame_rechercher = tk.LabelFrame(self.fen, text="Rechercher dans la base", bg=self.couleur,
                                          font=("Courrier", 22))
-        frame_rechercher.grid(row=1, column=0, pady=15, padx=15)
+        frame_rechercher.grid(row=1, column=0, pady=15, padx=15, sticky="nwse")
+
+        frame_rechercher.rowconfigure(0, weight=1)
+        frame_rechercher.rowconfigure(1, weight=1)
+        frame_rechercher.rowconfigure(2, weight=1)
+        frame_rechercher.rowconfigure(3, weight=1)
+        frame_rechercher.columnconfigure(0, weight=1)
 
         rechercher_livres_empruntes = tk.Button(frame_rechercher,
                                                 text="Rechercher les livres empruntés par une personne ", width=40,
                                                 height=2, font=("Courrier", 11),
                                                 command=self.recherche_livres_empruntes_graphique)
-        rechercher_livres_empruntes.pack(pady=2)
+        rechercher_livres_empruntes.grid(row=0, column=0, sticky="nwse")
         rechercher_livre_emprunte_isbn = tk.Button(frame_rechercher, text="Rechercher un livre emprunté par ISBN",
                                                    width=40, height=2, font=("Courrier", 11),
                                                    command=self.recherche_livre_isbn_graphique)
-        rechercher_livre_emprunte_isbn.pack(pady=2)
+        rechercher_livre_emprunte_isbn.grid(row=1, column=0, sticky="nwse", pady=3)
         affiche_personnes_retard = tk.Button(frame_rechercher, text="Afficher les personnes en retard", width=40,
                                              height=2, font=("Courrier", 11), command=self.retardataires_graphique)
-        affiche_personnes_retard.pack(pady=2)
+        affiche_personnes_retard.grid(row=2, column=0, sticky="nwse")
         rechercher_livre_mot_cle = tk.Button(frame_rechercher, text="Rechercher un livre par mot clé", width=40,
                                              height=2, font=("Courrier", 11),
                                              command=self.recherche_isbn_mot_cle_graphique)
-        rechercher_livre_mot_cle.pack(pady=2)
+        rechercher_livre_mot_cle.grid(row=3, column=0, sticky="nwse", pady=3)
 
         # Frame qui va gérer la section insertion dans la base
         frame_inserer = tk.LabelFrame(self.fen, text="Insérer dans la base", bg=self.couleur, font=("Courrier", 22))
-        frame_inserer.grid(row=1, column=1, pady=11, padx=15)
+        frame_inserer.grid(row=1, column=1, pady=15, padx=15, sticky="nwse")
+
+        frame_inserer.rowconfigure(0, weight=1)
+        frame_inserer.rowconfigure(1, weight=1)
+        frame_inserer.rowconfigure(2, weight=1)
+        frame_inserer.columnconfigure(0, weight=1)
 
         inserer_usager = tk.Button(frame_inserer, text="Insérer un usager", width=40, height=2, font=("Courrier", 11),
                                    command=self.inserer_usager_graphique)
-        inserer_usager.pack(pady=2)
+        inserer_usager.grid(row=0, column=0, sticky="nwse")
         inserer_livre = tk.Button(frame_inserer, text="Insérer un livre", width=40, height=2, font=("Courrier", 11),
                                   command=self.inserer_livre_graphique)
-        inserer_livre.pack(pady=2)
+        inserer_livre.grid(row=1, column=0, sticky="nwse", pady=5)
         inserer_emprunt = tk.Button(frame_inserer, text="Insérer un emprunt", width=40, height=2, font=("Courrier", 11),
                                     command=self.inserer_emprunt_graphique)
-        inserer_emprunt.pack(pady=2)
+        inserer_emprunt.grid(row=2, column=0, sticky="nwse")
 
         # Frame qui va gérer la section mise à jour de la base
         frame_mise_a_jour = tk.LabelFrame(self.fen, text="Mettre à jour la base", bg=self.couleur,
                                           font=("Courrier", 22))
-        frame_mise_a_jour.grid(row=2, column=0, pady=11, padx=15)
+        frame_mise_a_jour.grid(row=2, column=0, pady=11, padx=15, sticky="nwse")
+
+        frame_mise_a_jour.rowconfigure(0, weight=1)
+        frame_mise_a_jour.rowconfigure(1, weight=1)
+        frame_mise_a_jour.columnconfigure(0, weight=1)
 
         changer_date_retour_livre = tk.Button(frame_mise_a_jour, text="Changer la date de retour d'un livre", width=40,
                                               height=2, font=("Courrier", 11),
                                               command=self.mettre_a_jour_date_retour_livre_graphique)
-        changer_date_retour_livre.pack(pady=2)
+        changer_date_retour_livre.grid(row=0, column=0, sticky="nwse")
         changer_donnee_usager = tk.Button(frame_mise_a_jour, text="Changer une donnée d'un usager", width=40, height=2,
                                           font=("Courrier", 11), command=self.mettre_a_jour_donnee_usager_graphique)
-        changer_donnee_usager.pack(pady=2)
+        changer_donnee_usager.grid(row=1, column=0, sticky="nwse", pady=7)
 
         # Frame qui va gérer la section supprimer dans la base
         frame_supprimer = tk.LabelFrame(self.fen, text="Supprimer dans la base", bg=self.couleur, font=("Courrier", 22))
-        frame_supprimer.grid(row=2, column=1, pady=15, padx=15)
+        frame_supprimer.grid(row=2, column=1, pady=15, padx=15, sticky="nwse")
+
+        frame_supprimer.rowconfigure(0, weight=1)
+        frame_supprimer.rowconfigure(1, weight=1)
+        frame_supprimer.columnconfigure(0, weight=1)
 
         supprimer_livre = tk.Button(frame_supprimer, text="Supprimer un livre de la base", width=40, height=2,
                                     font=("Courrier", 11), command=self.supprimer_livre_graphique)
-        supprimer_livre.pack(pady=2)
+        supprimer_livre.grid(row=0, column=0, sticky="nwse")
         supprimer_emprunt = tk.Button(frame_supprimer, text="Supprimer un emprunt", width=40, height=2,
                                       font=("Courrier", 11), command=self.supprimer_emprunt_graphique)
-        supprimer_emprunt.pack(pady=2)
+        supprimer_emprunt.grid(row=1, column=0, sticky="nwse", pady=7)
 
         self.fen.mainloop()
+
+    def center_toplevel(self, width: int, height: int):
+        x_coordinate = int((self.fen.winfo_width() / 2) - (width / 2) + self.fen.winfo_x())
+        y_coordinate = int((self.fen.winfo_height() / 2) - (height / 2) + self.fen.winfo_y())
+        return f'{width}x{height}+{x_coordinate}+{y_coordinate}'
 
     def recherche_livres_empruntes_graphique(self):
 
@@ -146,7 +176,8 @@ class App:
             entry_code_barre.delete(0, tk.END)
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")
+        # fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(500, 400))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -190,7 +221,8 @@ class App:
             entry_isbn.delete(0, tk.END)
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")
+        # fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(400, 250))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -239,7 +271,8 @@ class App:
                     scrolledtext_retardataires.insert(tk.END, "\n")
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"350x450+{self.fen.winfo_x() + 250}+{self.fen.winfo_y() + 30}")
+        # fen.geometry(f"350x450+{self.fen.winfo_x() + 250}+{self.fen.winfo_y() + 30}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(350, 450))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -268,7 +301,8 @@ class App:
                     scrolledtext_livres.insert(tk.END, "Aucun livre trouvé !")
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")
+        # fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(500, 400))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -338,7 +372,8 @@ class App:
                 affiche_code_barre_qrcode()
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"400x300+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")
+        # fen.geometry(f"400x300+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(400, 300))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -401,7 +436,8 @@ class App:
                 entry_isbn.delete(0, tk.END)
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")
+        # fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(400, 250))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -461,7 +497,8 @@ class App:
                     messagebox.showerror("Code barre invalide", "Le code barre ne correspond à personne", parent=fen)
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"400x200+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 150}")
+        # fen.geometry(f"400x200+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 150}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(400, 200))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -529,7 +566,8 @@ class App:
                 messagebox.showinfo("Informations manquantes", "Renseignez les informations manquantes pour continuer")
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"450x250+{self.fen.winfo_x() + 180}+{self.fen.winfo_y() + 120}")
+        # fen.geometry(f"450x250+{self.fen.winfo_x() + 180}+{self.fen.winfo_y() + 120}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(450, 250))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -849,7 +887,8 @@ class App:
                 fen_email.mainloop()
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"600x400+{self.fen.winfo_x() + 100}+{self.fen.winfo_y() + 50}")
+        # fen.geometry(f"600x400+{self.fen.winfo_x() + 100}+{self.fen.winfo_y() + 50}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(600, 400))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -966,7 +1005,8 @@ class App:
                     label_isbn_result["text"] = ""
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"500x280+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 110}")
+        # fen.geometry(f"500x280+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 110}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(500, 280))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -1042,7 +1082,8 @@ class App:
                     label_retour_result["text"] = ""
 
         fen = tk.Toplevel(self.fen)
-        fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")
+        # fen.geometry(f"400x250+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 120}")  # Ne centre pas la fenêtre
+        fen.geometry(self.center_toplevel(400, 250))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
