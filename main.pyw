@@ -1130,4 +1130,4 @@ class App:
 
 
 if __name__ == '__main__':
-    app = App()
+    db = sqlite3.connect("bibliotheque.db")
