@@ -8,6 +8,7 @@ import datetime
 import sqlite3
 import random
 import string
+import re
 
 
 def convert_date(x):
@@ -284,25 +285,22 @@ class App:
         fen.after(0, lambda: retardataires_fonction())
         fen.mainloop()
 
-    def recherche_isbn_mot_cle_graphique(self):
+    def recherche_isbn_mot_cle_graphique(self): # Revoir la fonction pour améliorer la visualisation des données
 
         def recherche_isbn_mot_cle_fonction():
-            scrolledtext_livres.delete("1.0", tk.END)
+            tree.delete(*tree.get_children())
             mot_cle = entry_mot_cle.get()
             if len(mot_cle) != 0:
                 self.db_cursor.execute('SELECT * FROM LIVRE WHERE titre LIKE ?', [f"%{mot_cle}%", ])
                 livres = self.db_cursor.fetchall()
                 if len(livres) != 0:
                     for i in range(0, len(livres)):
-                        scrolledtext_livres.insert(tk.END, f"Livre n°{i+1}\nTitre : {livres[i][0]}\n"
-                                                           f"Editeur : {livres[i][1]}\nAnnée : {livres[i][2]}\n"
-                                                           f"Isbn : {livres[i][3]}\n\n")
+                        tree.insert('', 'end', text=F"Livre n°{i+1}", values=(livres[i][0], livres[i][1], livres[i][2], livres[i][3]))
                 else:
-                    scrolledtext_livres.insert(tk.END, "Aucun livre trouvé !")
+                    pass
 
         fen = tk.Toplevel(self.fen)
-        # fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")  # Ne centre pas la fenêtre
-        fen.geometry(self.center_toplevel(500, 400))
+        fen.geometry(self.center_toplevel(700, 400))
         fen.resizable(False, False)
         fen.transient(self.fen)
         fen.grab_set()
@@ -316,8 +314,29 @@ class App:
         entry_mot_cle = tk.Entry(frame, font=("Courrier", 13), width=20)
         entry_mot_cle.grid(row=0, column=1, sticky="w")
 
-        scrolledtext_livres = tkscroll.ScrolledText(frame, width=40, height=18, font=("Courrier", 12))
-        scrolledtext_livres.grid(row=1, column=0, columnspan=3)
+        frame_tree = tk.Frame(frame)
+        frame_tree.grid(row=1, column=0, columnspan=3)
+
+        tree = ttk.Treeview(frame_tree, columns=("Titre", "Editeur", "Année", "Isbn"), selectmode="browse")
+
+        tree.heading("#0", text="Livre")
+        tree.heading("#1", text="Titre")
+        tree.heading("#2", text="Editeur")
+        tree.heading("#3", text="Année")
+        tree.heading("#4", text="Isbn")
+
+        tree.column("#0", stretch=tk.YES, minwidth=90, width=90)
+        tree.column("#1", stretch=tk.YES)
+        tree.column("#2", stretch=tk.YES)
+        tree.column("#3", stretch=tk.YES, minwidth=45, width=45)
+        tree.column("#4", stretch=tk.YES, minwidth=95, width=95)
+
+        treeScroll = ttk.Scrollbar(frame_tree)
+        treeScroll.configure(command=tree.yview)
+        tree.configure(yscrollcommand=treeScroll.set)
+        treeScroll.pack(side=tk.RIGHT, fill=tk.BOTH)
+
+        tree.pack(expand=tk.YES)
 
         entry_mot_cle.bind("<KeyRelease>", lambda event: recherche_isbn_mot_cle_fonction())
         fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
@@ -347,29 +366,41 @@ class App:
                 img = tk.BitmapImage(data=pyqrcode.create(code_barre).xbm(scale=8))
                 tk.Label(fen_qrcode, image=img).pack(expand=tk.YES)
 
-                tk.Label(fen_qrcode, text=f"Le code barre est {code_barre}", font=("Courrier", 12)).pack(pady=5)
+                tk.Label(fen_qrcode, text=f"Le code barre est : {code_barre}", font=("Courrier", 12)).pack(pady=5)
 
                 fen_qrcode.mainloop()
+
+            def check_email(email):
+                regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b'
+                if re.fullmatch(regex, email):
+                    return True
+                else:
+                    return False
 
             nom = entry_nom.get().upper()
             prenom = entry_prenom.get().upper()
             adresse = entry_adresse.get()
             cp = entry_cp.get()
             ville = entry_ville.get().title()
-            email = entry_ville.get()
+            email = entry_email.get()
             code_barre = genere_code_barre()
             if len(nom) != 0 and len(prenom) != 0 and len(adresse) != 0 and len(cp) != 0 and len(ville) != 0 \
                     and len(email) != 0:
-                data_usager = [nom, prenom, adresse, cp, ville, email, code_barre]
-                self.db_cursor.execute('INSERT INTO USAGER VALUES (?,?,?,?,?,?,?)', data_usager)
-                self.db_conn.commit()
-                entry_nom.delete(0, tk.END)
-                entry_prenom.delete(0, tk.END)
-                entry_adresse.delete(0, tk.END)
-                entry_cp.delete(0, tk.END)
-                entry_ville.delete(0, tk.END)
-                entry_email.delete(0, tk.END)
-                affiche_code_barre_qrcode()
+                if check_email(email):
+                    data_usager = [nom, prenom, adresse, cp, ville, email, code_barre]
+                    #self.db_cursor.execute('INSERT INTO USAGER VALUES (?,?,?,?,?,?,?)', data_usager)
+                    #self.db_conn.commit()
+                    entry_nom.delete(0, tk.END)
+                    entry_prenom.delete(0, tk.END)
+                    entry_adresse.delete(0, tk.END)
+                    entry_cp.delete(0, tk.END)
+                    entry_ville.delete(0, tk.END)
+                    entry_email.delete(0, tk.END)
+                    affiche_code_barre_qrcode()
+                else:
+                    messagebox.showwarning("Adresse mail invalide", "L'adresse mail est invalide", parent=fen)
+            else:
+                messagebox.showinfo("Informations manquantes", "Renseignez toutes les informations")
 
         fen = tk.Toplevel(self.fen)
         # fen.geometry(f"400x300+{self.fen.winfo_x() + 200}+{self.fen.winfo_y() + 100}")  # Ne centre pas la fenêtre
@@ -1130,4 +1161,4 @@ class App:
 
 
 if __name__ == '__main__':
-    db = sqlite3.connect("bibliotheque.db")
+    app = App()
