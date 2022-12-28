@@ -285,7 +285,7 @@ class App:
         fen.after(0, lambda: retardataires_fonction())
         fen.mainloop()
 
-    def recherche_isbn_mot_cle_graphique(self): # Revoir la fonction pour améliorer la visualisation des données
+    def recherche_isbn_mot_cle_graphique(self):
 
         def recherche_isbn_mot_cle_fonction():
             tree.delete(*tree.get_children())
@@ -311,11 +311,11 @@ class App:
 
         label_mot_cle = tk.Label(frame, text="Mot clé : ", font=("Courrier", 14))
         label_mot_cle.grid(row=0, column=0, sticky="e")
-        entry_mot_cle = tk.Entry(frame, font=("Courrier", 13), width=20)
+        entry_mot_cle = tk.Entry(frame, font=("Courrier", 13), width=25)
         entry_mot_cle.grid(row=0, column=1, sticky="w")
 
-        frame_tree = tk.Frame(frame)
-        frame_tree.grid(row=1, column=0, columnspan=3)
+        frame_tree = tk.Frame(fen)
+        frame_tree.pack(expand=tk.YES)
 
         tree = ttk.Treeview(frame_tree, columns=("Titre", "Editeur", "Année", "Isbn"), selectmode="browse")
 
@@ -338,7 +338,19 @@ class App:
 
         tree.pack(expand=tk.YES)
 
+        def test_copy(event):  # Fonction temporaire pour tester
+            col = int(tree.identify_column(event.x).split("#")[1])
+            if col != 0:
+                item = tree.item(tree.focus())['values'][col - 1]
+                fen.clipboard_clear()
+                fen.clipboard_append(item)
+                label_copy["text"] = f'"{item}" copié !'
+
+        label_copy = tk.Label(fen, font=("Courrier", 12))
+        label_copy.pack(expand=tk.YES)
+
         entry_mot_cle.bind("<KeyRelease>", lambda event: recherche_isbn_mot_cle_fonction())
+        tree.bind('<ButtonRelease-1>', test_copy)
         fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
         fen.mainloop()
 
