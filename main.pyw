@@ -158,8 +158,9 @@ class App:
 
     def recherche_livres_empruntes_graphique(self):
 
-        def rechercher_livres_empruntes_fonction():
-            scrolledtext_livres_empruntes.delete("1.0", tk.END)
+        def recherche_livres_empruntes_fonction():
+            label_copy["text"] = ""
+            tree.delete(*tree.get_children())
             code_barre = entry_code_barre.get()
             if len(code_barre) != 0 and len(code_barre) == 15:
                 self.db_cursor.execute('SELECT * FROM LIVRE JOIN EMPRUNT ON LIVRE.isbn = EMPRUNT.isbn '
@@ -167,20 +168,23 @@ class App:
                 livres_empruntes = self.db_cursor.fetchall()
                 if len(livres_empruntes) != 0:
                     for i in range(0, len(livres_empruntes)):
-                        scrolledtext_livres_empruntes.insert(tk.END,
-                                                             f"Livre n°{i + 1}\nTitre : {livres_empruntes[i][0]}\n"
-                                                             f"Editeur : {livres_empruntes[i][1]}\n"
-                                                             f"Année : {livres_empruntes[i][2]}\n"
-                                                             f"Isbn : {livres_empruntes[i][3]}\n\n")
+                        tree.insert('', 'end', text=F"Livre n°{i+1}", values=(livres_empruntes[i][0], livres_empruntes[i][1], livres_empruntes[i][2], livres_empruntes[i][3]))
                 else:
-                    scrolledtext_livres_empruntes.insert(tk.END, "Aucun livre emprunté !")
+                    label_copy["text"] = "Aucun livre emprunté"
             entry_code_barre.delete(0, tk.END)
-
+        
+        def copy_element_tree(event):
+            col = int(tree.identify_column(event.x).split("#")[1])
+            if col != 0:
+                item = tree.item(tree.focus())['values'][col - 1]
+                fen.clipboard_clear()
+                fen.clipboard_append(item)
+                label_copy["text"] = f'"{item}" copié !'
+        
         fen = tk.Toplevel(self.fen)
-        # fen.geometry(f"500x400+{self.fen.winfo_x() + 150}+{self.fen.winfo_y() + 50}")  # Ne centre pas la fenêtre
-        fen.geometry(self.center_toplevel(500, 400))
+        fen.geometry(self.center_toplevel(700, 400))
         fen.resizable(False, False)
-        fen.transient(self.fen)
+        fen.transient()
         fen.grab_set()
         fen.focus_set()
 
@@ -192,14 +196,38 @@ class App:
         entry_code_barre = tk.Entry(frame, font=("Courrier", 13), width=20)
         entry_code_barre.grid(row=0, column=1, sticky="w")
         button_valider = tk.Button(frame, text="Valider", font=("Courrier", 12),
-                                   command=rechercher_livres_empruntes_fonction)
+                                   command=recherche_livres_empruntes_fonction)
         button_valider.grid(row=0, column=2, sticky="")
 
-        scrolledtext_livres_empruntes = tkscroll.ScrolledText(frame, width=40, height=18, font=("Courrier", 12))
-        scrolledtext_livres_empruntes.grid(row=1, column=0, columnspan=3)
+        frame_tree = tk.Frame(fen)
+        frame_tree.pack(expand=tk.YES)
 
-        entry_code_barre.bind("<Return>", lambda event: rechercher_livres_empruntes_fonction())
-        fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
+        tree = ttk.Treeview(frame_tree, columns=("Titre", "Editeur", "Année", "Isbn"), selectmode="browse")
+
+        tree.heading("#0", text="Livre")
+        tree.heading("#1", text="Titre")
+        tree.heading("#2", text="Editeur")
+        tree.heading("#3", text="Année")
+        tree.heading("#4", text="Isbn")
+
+        tree.column("#0", stretch=tk.YES, minwidth=90, width=90)
+        tree.column("#1", stretch=tk.YES)
+        tree.column("#2", stretch=tk.YES)
+        tree.column("#3", stretch=tk.YES, minwidth=45, width=45)
+        tree.column("#4", stretch=tk.YES, minwidth=95, width=95)
+
+        treeScroll = ttk.Scrollbar(frame_tree)
+        treeScroll.configure(command=tree.yview)
+        tree.configure(yscrollcommand=treeScroll.set)
+        treeScroll.pack(side=tk.RIGHT, fill=tk.BOTH)
+
+        tree.pack(expand=tk.YES)
+
+        label_copy = tk.Label(fen, font=("Courrier", 12))
+        label_copy.pack(expand=tk.YES)
+
+        tree.bind("<ButtonRelease-1>", copy_element_tree)
+        fen.protocol("WN_DELETE_WINDOW", lambda: fen.destroy())
         fen.mainloop()
 
     def recherche_livre_isbn_graphique(self):
@@ -214,7 +242,7 @@ class App:
                 if len(emprunteur) != 0:
                     scrolledtext_emprunteur.insert(tk.END, f"Nom : {emprunteur[0][0]}\nPrénom : {emprunteur[0][1]}\n"
                                                            f"Adresse : {emprunteur[0][2]}\n"
-                                                           f"Code postal : {emprunteur[0][3]}\n "
+                                                           f"Code postal : {emprunteur[0][3]}\n"
                                                            f"Ville : {emprunteur[0][4]}\nEmail : {emprunteur[0][5]}\n"
                                                            f"Code barre : {emprunteur[0][6]}")
                 else:
@@ -296,8 +324,14 @@ class App:
                 if len(livres) != 0:
                     for i in range(0, len(livres)):
                         tree.insert('', 'end', text=F"Livre n°{i+1}", values=(livres[i][0], livres[i][1], livres[i][2], livres[i][3]))
-                else:
-                    pass
+        
+        def copy_element_tree(event):
+            col = int(tree.identify_column(event.x).split("#")[1])
+            if col != 0:
+                item = tree.item(tree.focus())['values'][col - 1]
+                fen.clipboard_clear()
+                fen.clipboard_append(item)
+                label_copy["text"] = f'"{item}" copié !'
 
         fen = tk.Toplevel(self.fen)
         fen.geometry(self.center_toplevel(700, 400))
@@ -338,19 +372,11 @@ class App:
 
         tree.pack(expand=tk.YES)
 
-        def test_copy(event):  # Fonction temporaire pour tester
-            col = int(tree.identify_column(event.x).split("#")[1])
-            if col != 0:
-                item = tree.item(tree.focus())['values'][col - 1]
-                fen.clipboard_clear()
-                fen.clipboard_append(item)
-                label_copy["text"] = f'"{item}" copié !'
-
         label_copy = tk.Label(fen, font=("Courrier", 12))
         label_copy.pack(expand=tk.YES)
 
         entry_mot_cle.bind("<KeyRelease>", lambda event: recherche_isbn_mot_cle_fonction())
-        tree.bind('<ButtonRelease-1>', test_copy)
+        tree.bind("<ButtonRelease-1>", copy_element_tree)
         fen.protocol("WM_DELETE_WINDOW", lambda: fen.destroy())
         fen.mainloop()
 
@@ -680,6 +706,13 @@ class App:
                 label_ville_result["text"] = data_usager[4]
                 label_email_result["text"] = data_usager[5]
                 label_code_barre_result["text"] = data_usager[6]
+
+                button_nom.grid(row=0, column=2, sticky="w")
+                button_prenom.grid(row=1, column=2, sticky="w")
+                button_adresse.grid(row=2, column=2, sticky="w")
+                button_code_postal.grid(row=3, column=2, sticky="w")
+                button_ville.grid(row=4, column=2, sticky="w")
+                button_email.grid(row=5, column=2, sticky="w")
             else:
                 messagebox.showinfo("Code barre manquant", "Renseignez un code barre pour continuer", parent=fen)
 
@@ -959,7 +992,6 @@ class App:
 
         button_nom = tk.Button(frame_changer_usager, text="Changer", font=("Courrier", 12),
                                command=changer_nom_graphique)
-        button_nom.grid(row=0, column=2, sticky="w")
 
         label_prenom = tk.Label(frame_changer_usager, text="Prénom : ", font=("Courrier", 12))
         label_prenom.grid(row=1, column=0, sticky="ne", pady=5)
@@ -969,7 +1001,6 @@ class App:
 
         button_prenom = tk.Button(frame_changer_usager, text="Changer", font=("Courrier", 12),
                                   command=changer_prenom_graphique)
-        button_prenom.grid(row=1, column=2, sticky="w")
 
         label_adresse = tk.Label(frame_changer_usager, text="Adresse : ", font=("Courrier", 12))
         label_adresse.grid(row=2, column=0, sticky="ne", pady=5)
@@ -979,7 +1010,6 @@ class App:
 
         button_adresse = tk.Button(frame_changer_usager, text="Changer", font=("Courrier", 12),
                                    command=changer_adresse_graphique)
-        button_adresse.grid(row=2, column=2, sticky="w")
 
         label_code_postal = tk.Label(frame_changer_usager, text="Code postal : ", font=("Courrier", 12))
         label_code_postal.grid(row=3, column=0, sticky="ne", pady=5)
@@ -989,7 +1019,6 @@ class App:
 
         button_code_postal = tk.Button(frame_changer_usager, text="Changer", font=("Courrier", 12),
                                        command=changer_code_postal_graphique)
-        button_code_postal.grid(row=3, column=2, sticky="w")
 
         label_ville = tk.Label(frame_changer_usager, text="Ville : ", font=("Courrier", 12))
         label_ville.grid(row=4, column=0, sticky="ne", pady=5)
@@ -999,7 +1028,6 @@ class App:
 
         button_ville = tk.Button(frame_changer_usager, text="Changer", font=("Courrier", 12),
                                  command=changer_ville_graphique)
-        button_ville.grid(row=4, column=2, sticky="w")
 
         label_email = tk.Label(frame_changer_usager, text="Email : ", font=("Courrier", 12))
         label_email.grid(row=5, column=0, sticky="ne", pady=5)
@@ -1009,7 +1037,6 @@ class App:
 
         button_email = tk.Button(frame_changer_usager, text="Changer", font=("Courrier", 12),
                                  command=changer_email_graphique)
-        button_email.grid(row=5, column=2, sticky="w")
 
         label_code_barre = tk.Label(frame_changer_usager, text="Code barre : ", font=("Courrier", 12))
         label_code_barre.grid(row=6, column=0, sticky="ne", pady=5)
